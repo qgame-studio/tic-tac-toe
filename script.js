@@ -173,6 +173,11 @@ class GameComponent extends HTMLElement {
         .pulse {
           animation: pulse 0.5s;
         }
+        @media (max-width: 480px) {
+          .cell {
+            font-size: 36px;
+          }
+        }
       </style>
       <div class="container">
         <h1>Tic Tac Toe</h1>
@@ -252,16 +257,16 @@ class GameComponent extends HTMLElement {
     this.shadowRoot.getElementById('reset-btn').addEventListener('click', this.resetGame);
     this.shadowRoot.getElementById('main-menu-btn').addEventListener('click', this.returnToMainMenu);
     this.shadowRoot.getElementById('play-again-btn').addEventListener('click', this.startGame);
-    
+
     // Game mode buttons
     this.shadowRoot.getElementById('two-player-btn').addEventListener('click', () => this.setGameMode('two-player'));
     this.shadowRoot.getElementById('ai-btn').addEventListener('click', () => this.setGameMode('ai'));
-    
+
     // AI difficulty buttons
     this.shadowRoot.getElementById('easy-btn').addEventListener('click', () => this.setAIDifficulty('easy'));
     this.shadowRoot.getElementById('medium-btn').addEventListener('click', () => this.setAIDifficulty('medium'));
     this.shadowRoot.getElementById('hard-btn').addEventListener('click', () => this.setAIDifficulty('hard'));
-    
+
     // Add click event to each cell
     const cells = this.shadowRoot.querySelectorAll('.cell');
     cells.forEach(cell => {
@@ -271,12 +276,12 @@ class GameComponent extends HTMLElement {
 
   setGameMode(mode) {
     this.gameMode = mode;
-    
+
     // Update button states
     this.shadowRoot.getElementById('two-player-btn').classList.remove('active');
     this.shadowRoot.getElementById('ai-btn').classList.remove('active');
     this.shadowRoot.getElementById(`${mode}-btn`).classList.add('active');
-    
+
     // Show/hide AI difficulty selector
     const aiDifficultySection = this.shadowRoot.getElementById('ai-difficulty');
     aiDifficultySection.style.display = mode === 'ai' ? 'block' : 'none';
@@ -284,12 +289,12 @@ class GameComponent extends HTMLElement {
 
   setAIDifficulty(level) {
     this.aiDifficulty = level;
-    
+
     // Reset active state for all buttons
     ['easy-btn', 'medium-btn', 'hard-btn'].forEach(id => {
       this.shadowRoot.getElementById(id).classList.remove('active');
     });
-    
+
     // Set active state for selected button
     this.shadowRoot.getElementById(`${level}-btn`).classList.add('active');
   }
@@ -300,7 +305,7 @@ class GameComponent extends HTMLElement {
     this.currentPlayer = 'X';
     this.gameActive = true;
     this.moveCounter = 0;
-    
+
     // Reset player X score and O score if coming from game over screen
     if (this.shadowRoot.getElementById('game-over').style.display === 'block') {
       this.playerXScore = 0;
@@ -308,29 +313,29 @@ class GameComponent extends HTMLElement {
       this.ties = 0;
       this.currentRound = 1;
     }
-    
+
     // Update UI
     const currentPlayerSpan = this.shadowRoot.getElementById('current-player');
     currentPlayerSpan.textContent = this.currentPlayer;
     currentPlayerSpan.className = 'player-x';
-    
+
     this.shadowRoot.getElementById('player-x-score').textContent = this.playerXScore;
     this.shadowRoot.getElementById('player-o-score').textContent = this.playerOScore;
     this.shadowRoot.getElementById('round').textContent = this.currentRound;
     this.shadowRoot.getElementById('result').textContent = '';
-    
+
     // Clear all cells
     const cells = this.shadowRoot.querySelectorAll('.cell');
     cells.forEach(cell => {
       cell.textContent = '';
       cell.className = 'cell';
     });
-    
+
     // Show game area, hide setup and game over
     this.shadowRoot.getElementById('game-setup').style.display = 'none';
     this.shadowRoot.getElementById('game-area').style.display = 'block';
     this.shadowRoot.getElementById('game-over').style.display = 'none';
-    
+
     // If playing against AI and AI goes first (O), make a move
     if (this.gameMode === 'ai' && this.currentPlayer === 'O') {
       setTimeout(() => this.makeAIMove(), 500);
@@ -339,35 +344,35 @@ class GameComponent extends HTMLElement {
 
   handleCellClick(cell) {
     if (!this.gameActive) return;
-    
+
     const index = cell.getAttribute('data-index');
-    
+
     // Check if cell is already filled
     if (this.board[index] !== '') return;
-    
+
     // Make the move
     this.board[index] = this.currentPlayer;
     cell.textContent = this.currentPlayer;
     cell.classList.add(this.currentPlayer.toLowerCase());
     this.moveCounter++;
-    
+
     // Check for win or draw
     if (this.checkWin()) {
       this.handleResult('win');
       return;
     }
-    
+
     if (this.moveCounter === 9) {
       this.handleResult('draw');
       return;
     }
-    
+
     // Switch player
     this.currentPlayer = this.currentPlayer === 'X' ? 'O' : 'X';
     const currentPlayerSpan = this.shadowRoot.getElementById('current-player');
     currentPlayerSpan.textContent = this.currentPlayer;
     currentPlayerSpan.className = this.currentPlayer === 'X' ? 'player-x' : 'player-o';
-    
+
     // If playing against AI, make AI move
     if (this.gameMode === 'ai' && this.currentPlayer === 'O') {
       setTimeout(() => this.makeAIMove(), 500);
@@ -376,9 +381,9 @@ class GameComponent extends HTMLElement {
 
   makeAIMove() {
     if (!this.gameActive) return;
-    
+
     let index;
-    
+
     switch (this.aiDifficulty) {
       case 'easy':
         // Random move
@@ -397,25 +402,25 @@ class GameComponent extends HTMLElement {
         index = this.getBestMove();
         break;
     }
-    
+
     // Make the move
     const cell = this.shadowRoot.querySelector(`.cell[data-index="${index}"]`);
     this.board[index] = this.currentPlayer;
     cell.textContent = this.currentPlayer;
     cell.classList.add(this.currentPlayer.toLowerCase());
     this.moveCounter++;
-    
+
     // Check for win or draw
     if (this.checkWin()) {
       this.handleResult('win');
       return;
     }
-    
+
     if (this.moveCounter === 9) {
       this.handleResult('draw');
       return;
     }
-    
+
     // Switch player
     this.currentPlayer = 'X';
     const currentPlayerSpan = this.shadowRoot.getElementById('current-player');
@@ -427,7 +432,7 @@ class GameComponent extends HTMLElement {
     const emptyCells = this.board
       .map((cell, index) => cell === '' ? index : -1)
       .filter(index => index !== -1);
-    
+
     return emptyCells[Math.floor(Math.random() * emptyCells.length)];
   }
 
@@ -435,7 +440,7 @@ class GameComponent extends HTMLElement {
     // Implementation of minimax algorithm for optimal move
     let bestScore = -Infinity;
     let bestMove;
-    
+
     for (let i = 0; i < 9; i++) {
       // Check if cell is empty
       if (this.board[i] === '') {
@@ -445,7 +450,7 @@ class GameComponent extends HTMLElement {
         const score = this.minimax(this.board, 0, false);
         // Undo the move
         this.board[i] = '';
-        
+
         // Update best score
         if (score > bestScore) {
           bestScore = score;
@@ -453,7 +458,7 @@ class GameComponent extends HTMLElement {
         }
       }
     }
-    
+
     return bestMove;
   }
 
@@ -465,7 +470,7 @@ class GameComponent extends HTMLElement {
       if (result === 'X') return depth - 10; // Human wins
       if (result === 'draw') return 0; // Draw
     }
-    
+
     if (isMaximizing) {
       // AI's turn (O) - maximize score
       let bestScore = -Infinity;
@@ -501,13 +506,13 @@ class GameComponent extends HTMLElement {
         return board[a]; // 'X' or 'O'
       }
     }
-    
+
     // Check for empty cells
     const emptyCells = board.filter(cell => cell === '');
     if (emptyCells.length === 0) {
       return 'draw';
     }
-    
+
     // Game still in progress
     return null;
   }
@@ -530,10 +535,10 @@ class GameComponent extends HTMLElement {
   handleResult(result) {
     this.gameActive = false;
     const resultElement = this.shadowRoot.getElementById('result');
-    
+
     if (result === 'win') {
       resultElement.textContent = `Player ${this.currentPlayer} wins!`;
-      
+
       // Update scores
       if (this.currentPlayer === 'X') {
         this.playerXScore++;
@@ -546,9 +551,9 @@ class GameComponent extends HTMLElement {
       resultElement.textContent = "It's a draw!";
       this.ties++;
     }
-    
+
     this.currentRound++;
-    
+
     // After 5 rounds, end the game session
     if (this.currentRound > 5) {
       setTimeout(() => this.endGameSession(), 1500);
@@ -561,22 +566,22 @@ class GameComponent extends HTMLElement {
     this.currentPlayer = 'X';
     this.gameActive = true;
     this.moveCounter = 0;
-    
+
     // Update UI
     const currentPlayerSpan = this.shadowRoot.getElementById('current-player');
     currentPlayerSpan.textContent = this.currentPlayer;
     currentPlayerSpan.className = 'player-x';
-    
+
     this.shadowRoot.getElementById('round').textContent = this.currentRound;
     this.shadowRoot.getElementById('result').textContent = '';
-    
+
     // Clear all cells
     const cells = this.shadowRoot.querySelectorAll('.cell');
     cells.forEach(cell => {
       cell.textContent = '';
       cell.className = 'cell';
     });
-    
+
     // If playing against AI and AI goes first (O), make a move
     if (this.gameMode === 'ai' && this.currentPlayer === 'O') {
       setTimeout(() => this.makeAIMove(), 500);
@@ -588,7 +593,7 @@ class GameComponent extends HTMLElement {
     this.shadowRoot.getElementById('game-setup').style.display = 'block';
     this.shadowRoot.getElementById('game-area').style.display = 'none';
     this.shadowRoot.getElementById('game-over').style.display = 'none';
-    
+
     // Reset scores
     this.playerXScore = 0;
     this.playerOScore = 0;
@@ -602,7 +607,7 @@ class GameComponent extends HTMLElement {
     this.shadowRoot.getElementById('final-o-score').textContent = this.playerOScore;
     this.shadowRoot.getElementById('ties').textContent = this.ties;
     this.shadowRoot.getElementById('rounds-played').textContent = this.currentRound - 1;
-    
+
     // Show game over screen
     this.shadowRoot.getElementById('game-area').style.display = 'none';
     this.shadowRoot.getElementById('game-over').style.display = 'block';
